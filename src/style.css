@@ -1,0 +1,71 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #222;
+  font-family: sans-serif;
+}
+
+body {
+  background: url('../assets/bruce face.jpg') center center no-repeat;
+  background-size: cover;
+}
+
+.split-screen {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  gap: 32px; /* Adjust as desired */
+  background: transparent; /* So body bg shows through */
+}
+
+.game-area {
+  width: calc(50vw - 16px); 
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background: #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Example grid styling */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(22, 40px);
+  grid-template-rows: repeat(22, 40px);
+  gap: 0;
+}
+
+.tile {
+  width: 40px;
+  height: 40px;
+  box-sizing: border-box; 
+  background-image: url('../assets/spritesheet.png');
+  z-index: 1;
+  position: relative;
+}
+
+.object {
+  width: 40px;
+  height: 40px;
+  z-index: 2;
+  position: relative;
+}
+.object.under {
+  z-index: 0;
+}
+
+/* Example player sprite styling */
+.player {
+  width: 40px;
+  height: 40px;
+  box-sizing: border-box; 
+  background: url('../assets/spritesheet.png') no-repeat 0 0;
+  z-index: 2;
+}
+
+.left  { background: #222; }
+.right { background: #444; }

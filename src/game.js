@@ -50,21 +50,6 @@ function placeBeerBottles(count, newMap = map, area = { xMin: 0, xMax: GRID_SIZE
   }
 }
 
-
-function placeObject(type, x, y, force) {
-  // Ensure not already taken
-  const taken = objects.some(pos => pos.x === x && pos.y === y)
-  if (!taken || force) {
-      objects.push({ type: "beer", x, y });
-      if (taken) {
-        // TODO : remove existing object
-      }        
-      return true;
-  }
-  return false;
-}
-
-
 // --- Game States ---
 // map is immutable and shared. 
 // objects mutable shared.
@@ -97,19 +82,34 @@ const controls = [
     "s": { dx:  1, dy:  0 },
     "w": { dx:  0, dy: -1 },
     "z": { dx:  0, dy:  1 },
-    "c": { dx:  0, dy:  0 },
+    "c": { drop: true },
     "v": { dx:  0, dy:  0 }
   },
-  // Player 2: ; ' [ / , .
+  // Player 2: L ; P . M ,
   {
     "l": { dx: -1, dy:  0 },
     ";": { dx:  1, dy:  0 },
     "p": { dx:  0, dy: -1 },
     ".": { dx:  0, dy:  1 },
-    "m": { dx:  0, dy:  0 },
+    "m": { drop: true },
     ",": { dx:  0, dy:  0 }
   }
 ];
+
+
+
+function placeObject(type, x, y, force) {
+  // Ensure not already taken
+  const taken = objects.some(pos => pos.x === x && pos.y === y)
+  if (!taken || force) {
+      objects.push({ type, x, y });
+      if (taken) {
+        // TODO : remove existing object
+      }        
+      return true;
+  }
+  return false;
+}
 
 // --- Rendering Functions ---
 
@@ -134,6 +134,15 @@ function renderObject(obj, gx, gy) {
   objDiv.style.gridColumnStart = gx;
   objDiv.style.zIndex = spec.zIndex;
   return objDiv;
+}
+
+function placeAndRenderObject(type, playerState, renderFn) {
+  const px = Math.floor(playerState.player.x / POS_FACTOR);
+  const py = Math.floor(playerState.player.y / POS_FACTOR);
+  const placed = placeObject(type, px, py);
+  if (placed) {
+    renderFn(playerState.area, playerState);
+  }
 }
 
 function render(areaId, playerState) {
@@ -224,12 +233,16 @@ document.addEventListener("keydown", (e) => {
   if (controls[0][key]) {
     if (movePlayer(playerStates[0], key, controls[0])) {
       render(playerStates[0].area, playerStates[0]);
+    } else if (controls[0][key].drop) {
+      placeAndRenderObject("egg", playerStates[0], render);
     }
   }
   // Player 2
   if (controls[1][key]) {
     if (movePlayer(playerStates[1], key, controls[1])) {
       render(playerStates[1].area, playerStates[1]);
+    } else if (controls[1][key].drop) {
+      placeAndRenderObject("egg", playerStates[1], render);
     }
   }
 });

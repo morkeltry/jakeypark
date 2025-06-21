@@ -46,7 +46,7 @@ function placeBeerBottles(count, newMap = map, area = { xMin: 0, xMax: GRID_SIZE
     const y = area.yMin + Math.floor(Math.random() * (area.yMax - area.yMin + 1));
     
     // don't fail if spot already used
-    (placeObject("beer", x, y, objects));
+    (placeObject("beer", x, y ));
   }
 }
 
@@ -129,6 +129,7 @@ function renderObject(obj, gx, gy) {
   const spec = OBJECT_SPRITES[obj.type.toLowerCase()];
   const objDiv = document.createElement("div");
   objDiv.className = `object ${spec.className}`;
+  objDiv.style.backgroundPosition = spec.background;
   objDiv.style.gridRowStart = gy;
   objDiv.style.gridColumnStart = gx;
   objDiv.style.zIndex = spec.zIndex;

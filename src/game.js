@@ -145,6 +145,8 @@ function placeAndRenderObject(type, playerState, renderFn) {
   }
 }
 
+
+// Main render
 function render(areaId, playerState) {
   const area = document.getElementById(areaId);
   area.innerHTML = "";
@@ -180,7 +182,7 @@ function render(areaId, playerState) {
     }
   }
 
-  // Player sprite (centered)
+  // Render player sprite (centered)
   const playerDiv = document.createElement("div");
   playerDiv.style.backgroundPosition = PLAYER_SPRITE_POSITION;
   playerDiv.className = "player";
@@ -204,7 +206,7 @@ console.log(objects);
 function movePlayer(playerState, dir, controlMap) {
   const move = controlMap[dir];
   if (!move) return false;
-  
+
   let { dx, dy } = move;
   const { map, player } = playerState;
 
@@ -220,9 +222,65 @@ function movePlayer(playerState, dir, controlMap) {
   player.x += dx * POS_FACTOR * (1 - friction);
   player.y += dy * POS_FACTOR * (1 - friction);
 
-  console.log(player);
+  // --- Collision detection here ---
+  const collisions = checkObjectCollision(player);
+
   
+  const shouldRerender = collisions.filter(collision => {
+    switch (collision.type.toLowerCase()) {
+      case 'egg':
+        console.log(`Bruce found an EGG at (${collision.x}, ${collision.y})!`);
+        // Remove the egg from the objects array
+        removeObject(collision);
+        return true; // This collision requires rerender
+      case 'beer':
+        console.log(`Bruce picked up a BEER at (${collision.x}, ${collision.y})!`);
+        // Handle beer logic here (e.g., increment inventory)
+        removeObject(collision);
+        return true; // This collision requires rerender
+      default:
+        console.log(`Bruce collided with ${collision.type} at (${collision.x}, ${collision.y})`);
+        return false;
+    }
+  });
+
+  shouldRerender.forEach (col => {console.log(col)});
+  
+  if (shouldRerender.length) {
+    playerStates.forEach(playerState=> {
+      render(playerState.area, playerState)
+    });
+  }
   return true;
+}
+
+
+
+function checkObjectCollision(player) {
+  // Bruce's position in tile coordinates (can be fractional)
+  const px = player.x / POS_FACTOR;
+  const py = player.y / POS_FACTOR;
+
+  const collisions = [];
+
+  for (const obj of objects) {
+    const dx = Math.max(0, 1 - Math.abs(obj.x + 0.499 - px));
+    const dy = Math.max(0, 1 - Math.abs(obj.y + 0.499 - py));
+    // If Bruce is 50% or more within the tile in both axes
+    if (dx >= 0.5 && dy >= 0.5) {
+      collisions.push(obj);
+    }
+  }
+  return collisions;
+}
+
+function removeObject(toRemove) {
+  console.log({objects}, {toRemove});
+  
+  const idx = objects.findIndex(
+    obj => obj.x === toRemove.x && obj.y === toRemove.y && obj.type === toRemove.type
+  );
+  if (idx !== -1) objects.splice(idx, 1);
 }
 
 // --- Keyboard Event Listener ---

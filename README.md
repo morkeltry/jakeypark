@@ -1,6 +1,10 @@
 ```
 cd zkverify
 npm i
+
+snarkjs powersoftau new bn128 18 pot18_0000.ptau -v
+snarkjs powersoftau contribute pot18_0000.ptau pot18_final.ptau --name="Brucey Battle" -v
+
 cd circom
 
 circom example.circom --r1cs --wasm --sym -l ../node_modules/circomlib/circuits -o build

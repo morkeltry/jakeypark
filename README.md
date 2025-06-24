@@ -1,4 +1,5 @@
 ```
+npm i -g snarkjs
 cd zkverify
 npm i
 
